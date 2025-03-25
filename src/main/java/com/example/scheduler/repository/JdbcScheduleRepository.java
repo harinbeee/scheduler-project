@@ -9,14 +9,12 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class JdbcScheduleRepository implements ScheduleRepository{
@@ -58,8 +56,24 @@ public class JdbcScheduleRepository implements ScheduleRepository{
     }
 
     @Override
-    public List<ScheduleResponseDto> findAllSchedules() {
-        return jdbcTemplate.query("select * from schedule", scheduleRowMapper());
+    public List<ScheduleResponseDto> findAllSchedules(String user, String date) {
+
+        StringBuilder sql = new StringBuilder("select * from schedule where 1=1 ");
+        List<Object> params = new ArrayList<>();
+
+        if (user != null){
+            sql.append("AND user = ?");
+            params.add(user);
+        }
+
+        if (date != null) {
+            sql.append("AND DATE(updated_at) = ?");
+            params.add(Date.valueOf(date));
+        }
+
+        sql.append("Order by updated_at desc");
+
+        return jdbcTemplate.query(sql.toString(),scheduleRowMapper(), params.toArray());
     }
 
     @Override

@@ -29,9 +29,12 @@ public class ScheduleController {
     }
 
     @GetMapping
-    public List<ScheduleResponseDto> findAllSchedules() {
+    public List<ScheduleResponseDto> findAllSchedules(
+            @RequestParam (required = false) String user,
+            @RequestParam (required = false) String date
+    ) {
 
-        return scheduleService.findAllSchedules();
+        return scheduleService.findAllSchedules(user,date);
 
     }
 
