@@ -67,4 +67,12 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         return new ScheduleResponseDto(scheduleRepository.findScheduleById(id).get());
     }
+
+    @Override
+    public void deleteSchedule(Long id, ScheduleRequestDto dto) {
+
+        int deleteRow = scheduleRepository.deleteSchedule(id, dto.getPassword());
+
+
+    }
 }
