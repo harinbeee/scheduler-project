@@ -31,6 +31,7 @@ public class JdbcScheduleRepository implements ScheduleRepository{
     public ScheduleResponseDto saveSchedule(Schedule schedule) {
         // 작성일 - 현재로 설정
         LocalDateTime createdAt = LocalDateTime.now();
+        LocalDateTime updatedAt = LocalDateTime.now();
 
         // DB에 id 저장
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
@@ -42,6 +43,7 @@ public class JdbcScheduleRepository implements ScheduleRepository{
         parameters.put("user", schedule.getUser());
         parameters.put("password", schedule.getPassword());
         parameters.put("created_at", Timestamp.valueOf(createdAt));
+        parameters.put("updated_at", Timestamp.valueOf(updatedAt));
 
         // PK와 연결하기
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters));
@@ -50,6 +52,7 @@ public class JdbcScheduleRepository implements ScheduleRepository{
                 key.longValue(),
                 schedule.getTodo(),
                 schedule.getUser(),
+                createdAt,
                 createdAt
         );
     }
@@ -66,6 +69,13 @@ public class JdbcScheduleRepository implements ScheduleRepository{
         return result.stream().findAny();
     }
 
+
+    @Override
+    public int updateSchedule(Long id, String todo, String user, String password, LocalDateTime updatedAt) {
+        updatedAt = LocalDateTime.now();
+        return jdbcTemplate.update("UPDATE schedule SET todo = ?, user = ?, updated_at = ? WHERE id = ? AND password = ?",todo, user, updatedAt, id, password);
+    }
+
     // ** RowMapper
     private RowMapper<ScheduleResponseDto> scheduleRowMapper() {
         return new RowMapper<ScheduleResponseDto>() {
@@ -75,7 +85,8 @@ public class JdbcScheduleRepository implements ScheduleRepository{
                         rs.getLong("id"),
                         rs.getString("todo"),
                         rs.getString("user"),
-                        rs.getTimestamp("created_at").toLocalDateTime()
+                        rs.getTimestamp("created_at").toLocalDateTime(),
+                        rs.getTimestamp("updated_at").toLocalDateTime()
                 );
             }
         };
@@ -89,7 +100,8 @@ public class JdbcScheduleRepository implements ScheduleRepository{
                         rs.getLong("id"),
                         rs.getString("todo"),
                         rs.getString("user"),
-                        rs.getTimestamp("created_at").toLocalDateTime()
+                        rs.getTimestamp("created_at").toLocalDateTime(),
+                        rs.getTimestamp("updated_at").toLocalDateTime()
                 );
             }
         };

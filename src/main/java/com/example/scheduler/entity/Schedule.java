@@ -24,11 +24,12 @@ public class Schedule {
     }
 
     // GET - 조회용 생성자
-    public Schedule(Long id, String todo, String user, LocalDateTime createdAt) {
+    public Schedule(Long id, String todo, String user, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.todo = todo;
         this.user = user;
         this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
 }

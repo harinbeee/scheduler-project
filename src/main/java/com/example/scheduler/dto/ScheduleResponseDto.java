@@ -14,12 +14,14 @@ public class ScheduleResponseDto {
     private String todo;
     private String user;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public ScheduleResponseDto(Schedule schedule) {
         this.id = schedule.getId();
         this.todo = schedule.getTodo();
         this.user = schedule.getUser();
         this.createdAt = schedule.getCreatedAt();
+        this.updatedAt = schedule.getUpdatedAt();
     }
 
 }

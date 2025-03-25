@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,5 +50,21 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
 
         return new ScheduleResponseDto(optionalSchedule.get());
+    }
+
+    @Override
+    public ScheduleResponseDto updateSchedule(Long id, ScheduleRequestDto dto ) {
+
+        if (dto.getTodo() == null || dto.getUser() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "할일과 작성자명을 모두 입력해주세요");
+        }
+
+        int updatedRow = scheduleRepository.updateSchedule(id, dto.getTodo(), dto.getUser(), dto.getPassword(), LocalDateTime.now());
+
+        if (updatedRow == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No data has been modified.");
+        }
+
+        return new ScheduleResponseDto(scheduleRepository.findScheduleById(id).get());
     }
 }
