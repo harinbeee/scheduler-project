@@ -8,8 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
@@ -24,16 +24,10 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public ScheduleResponseDto saveSchedule(ScheduleRequestDto dto) {
 
-        // 자동 생성 - 작성일
-        LocalDateTime createdAt = LocalDateTime.now();
+        // Schedule 객체 생성
+        Schedule schedule = new Schedule(dto.getTodo(),dto.getUser(),dto.getPassword());
 
-        // Schedule 객체 생성 ID는 repository에서 !
-        Schedule schedule = new Schedule(dto.getTodo(), dto.getUser(), createdAt);
-
-        // Schedule DB에 저장
-        Schedule savedSchedule = scheduleRepository.saveSchedule(schedule);
-
-        return new ScheduleResponseDto(savedSchedule);
+        return scheduleRepository.saveSchedule(schedule);
     }
 
     @Override
@@ -47,13 +41,13 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public ScheduleResponseDto findScheduleById(Long id) {
 
-        Schedule schedule = scheduleRepository.findScheduleById(id);
+        Optional<Schedule> optionalSchedule = scheduleRepository.findScheduleById(id);
 
         // NPE 방지
-        if (schedule == null) {
+        if (optionalSchedule.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id);
         }
 
-        return new ScheduleResponseDto(schedule);
+        return new ScheduleResponseDto(optionalSchedule.get());
     }
 }

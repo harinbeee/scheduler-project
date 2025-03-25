@@ -1,11 +1,13 @@
 package com.example.scheduler.dto;
 
 import com.example.scheduler.entity.Schedule;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@AllArgsConstructor
 public class ScheduleResponseDto {
 
     private Long id;
@@ -18,8 +20,6 @@ public class ScheduleResponseDto {
         this.todo = schedule.getTodo();
         this.user = schedule.getUser();
         this.createdAt = schedule.getCreatedAt();
-
     }
-
 
 }

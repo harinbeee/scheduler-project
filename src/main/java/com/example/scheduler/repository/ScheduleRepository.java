@@ -4,13 +4,15 @@ import com.example.scheduler.dto.ScheduleResponseDto;
 import com.example.scheduler.entity.Schedule;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface ScheduleRepository {
 
-    Schedule saveSchedule (Schedule schedule);
+    ScheduleResponseDto saveSchedule (Schedule schedule);
 
     List<ScheduleResponseDto> findAllSchedules();
 
-    Schedule findScheduleById (Long id);
+    Optional<Schedule> findScheduleById (Long id);
+
 }
