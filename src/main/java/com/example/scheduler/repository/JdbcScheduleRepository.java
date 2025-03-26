@@ -19,15 +19,16 @@ import java.util.*;
 @Repository
 public class JdbcScheduleRepository implements ScheduleRepository{
 
-    // **의존성 추가
+    // ** 의존성
     private final JdbcTemplate jdbcTemplate;
+    // ** 생성자 주입
     public JdbcScheduleRepository(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     @Override
     public ScheduleResponseDto saveSchedule(Schedule schedule) {
-        // 작성일 - 현재로 설정
+        // 작성일, 수정일 - 현재로 설정
         LocalDateTime createdAt = LocalDateTime.now();
         LocalDateTime updatedAt = LocalDateTime.now();
 
@@ -51,29 +52,29 @@ public class JdbcScheduleRepository implements ScheduleRepository{
                 schedule.getTodo(),
                 schedule.getUser(),
                 createdAt,
-                createdAt
+                createdAt // updatedAt의 자리이지만 생성시 작성일==수정일 이므로
         );
     }
 
     @Override
     public List<ScheduleResponseDto> findAllSchedules(String user, String date) {
 
-        StringBuilder sql = new StringBuilder("select * from schedule where 1=1 ");
-        List<Object> params = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("select * from schedule where 1=1 "); // sql 시작 부분 생성
+        List<Object> fillteringSql = new ArrayList<>(); // 조건별로 사용할 sql문을 담는 list
 
         if (user != null){
             sql.append("AND user = ?");
-            params.add(user);
+            fillteringSql.add(user);
         }
 
         if (date != null) {
             sql.append("AND DATE(updated_at) = ?");
-            params.add(Date.valueOf(date));
+            fillteringSql.add(Date.valueOf(date));
         }
 
-        sql.append("Order by updated_at desc");
+        sql.append("Order by updated_at desc"); // 수정일 순으로 내림차순 정렬
 
-        return jdbcTemplate.query(sql.toString(),scheduleRowMapper(), params.toArray());
+        return jdbcTemplate.query(sql.toString(),scheduleRowMapper(), fillteringSql.toArray());
     }
 
     @Override

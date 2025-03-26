@@ -15,9 +15,9 @@ import java.util.Optional;
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
 
-    //** repository 주입하기
+    // **의존성
     private final ScheduleRepository scheduleRepository;
-    //** 생성자
+    // **생성자 주입
     public ScheduleServiceImpl(ScheduleRepository scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
     }
@@ -25,7 +25,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public ScheduleResponseDto saveSchedule(ScheduleRequestDto dto) {
 
-        // Schedule 객체 생성
         Schedule schedule = new Schedule(dto.getTodo(),dto.getUser(),dto.getPassword());
 
         return scheduleRepository.saveSchedule(schedule);
@@ -34,6 +33,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public List<ScheduleResponseDto> findAllSchedules(String user, String date) {
 
+        // List로 전체 일정 담기
         List<ScheduleResponseDto> allSchedules = scheduleRepository.findAllSchedules(user, date);
 
         return allSchedules;
@@ -46,7 +46,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         // NPE 방지
         if (optionalSchedule.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 id = " + id);
         }
 
         return new ScheduleResponseDto(optionalSchedule.get());
@@ -55,16 +55,19 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public ScheduleResponseDto updateSchedule(Long id, ScheduleRequestDto dto ) {
 
+        // null 값 방지
         if (dto.getTodo() == null || dto.getUser() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "할일과 작성자명을 모두 입력해주세요");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정할 일정과 작성자명을 모두 입력해주세요");
         }
 
         int updatedRow = scheduleRepository.updateSchedule(id, dto.getTodo(), dto.getUser(), dto.getPassword(), LocalDateTime.now());
 
+        // NPE 방지
         if (updatedRow == 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No data has been modified.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "수정할 일정이 없거나 비밀번호가 일치하지 않습니다.");
         }
 
+        // 선택 일정 수정 후 수정된 일정 id로 찾아 반환
         return new ScheduleResponseDto(scheduleRepository.findScheduleById(id).get());
     }
 
@@ -73,6 +76,10 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         int deleteRow = scheduleRepository.deleteSchedule(id, dto.getPassword());
 
+        // null 값 방지
+        if (deleteRow == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "일정이 존재하지 않거나 비밀번호가 일치하지 않습니다.");
 
+        }
     }
 }

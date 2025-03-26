@@ -13,19 +13,17 @@ import java.util.List;
 @RequestMapping("/schedules")
 public class ScheduleController {
 
-    // **Service 주입하기
+    // **의존성
     private final ScheduleService scheduleService;
-    // **생성자
+    // **생성자 주입
     public ScheduleController(ScheduleService scheduleService) {
         this.scheduleService = scheduleService;
     }
-
 
     @PostMapping
     public ResponseEntity<ScheduleResponseDto> createSchedule(@RequestBody ScheduleRequestDto dto) {
 
         return new ResponseEntity<>(scheduleService.saveSchedule(dto), HttpStatus.CREATED);
-
     }
 
     @GetMapping
@@ -35,14 +33,12 @@ public class ScheduleController {
     ) {
 
         return scheduleService.findAllSchedules(user,date);
-
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ScheduleResponseDto> findScheduleById (@PathVariable Long id) {
 
         return new ResponseEntity<>(scheduleService.findScheduleById(id), HttpStatus.OK);
-
     }
 
     @PatchMapping("/{id}")
